@@ -15,13 +15,18 @@
 
   <body>
     <audio id="player"></audio>
-    <h1>Show a base wave analyzer</h2>
+    <h1>Creating a base canvas to fill and write an analyser node on</h2>
     <canvas id="canvas" width="300" height="300"></canvas>
     <script>
       const audioContext = new window.AudioContext();
+
+      // grab canvas element
       const canvasEl = document.getElementById('canvas');
+
+      // create analyser to attach to the media stream
       const analyser = audioContext.createAnalyser();
 
+      // grabbing the mic and delivering data into app
       navigator.getUserMedia(
         { audio: true },
         stream => audioContext.createMediaStreamSource(stream).connect(analyser),
@@ -30,16 +35,17 @@
 
       const dataArray = new Uint8Array(analyser.frequencyBinCount);
 
-      const canvasContext = canvasEl.getContext('2d'); // a canvas I have in my HTML
+      const canvasContext = canvasEl.getContext('2d');
       canvasContext.fillStyle = 'green';
 
-      // creating a pattern
+      // creating a pattern interval of four wavelengths per second
       setInterval(() => {
         analyser.getByteTimeDomainData(dataArray);
+        console.log('datarray example', dataArray)
         dataArray.forEach((item, i) => {
           canvasContext.fillRect(i, item, 1, 1);
         });
-      }, 300);
+      }, 250);
     </script>
   </body>
 
