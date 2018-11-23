@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width">
+
+    <title>createMediaStreamSource example</title>
+
+    <link rel="stylesheet" href="">
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+    <audio id="player"></audio>
+    <h1>Creating a base canvas to fill and write an analyser node on</h2>
+    <canvas id="canvas" width="300" height="300"></canvas>
+    <script>
+      // Goals -> identifying where the wavelength crosses the node.
+      const audioContext = new window.AudioContext();
+
+      // grab canvas element
+      const canvasEl = document.getElementById('canvas');
+
+      // create analyser to attach to the media stream
+      const analyser = audioContext.createAnalyser();
+
+      // grabbing the mic and delivering data into app
+      navigator.getUserMedia(
+        { audio: true },
+        stream => audioContext.createMediaStreamSource(stream).connect(analyser),
+        err => console.log(err)
+      );
+
+      const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+      const canvasContext = canvasEl.getContext('2d');
+      canvasContext.fillStyle = 'green';
+
+      const checkForPitch = soundArray => {
+        let prevDatum = 0;
+        const blah = [];
+        const twoPoints = soundArray.forEach((datum, pos) => {
+          console.log(`prevDatum:${prevDatum} against datum:${datum}`);
+          if (prevDatum <= 128 && datum > 128) {
+            const difference = pos - prevDatum;
+            data.push(difference);
+          }
+          prevDatum = pos;
+        })
+      }
+
+      // creating a pattern interval of four wavelengths per second
+      setInterval(() => {
+        analyser.getByteTimeDomainData(dataArray);
+        const pitch = checkForPitch(dataArray);
+        console.log('data', pitch);
+        dataArray.forEach((item, i) => {
+          canvasContext.fillRect(i, item, 1, 1);
+        });
+      }, 250);
+    </script>
+  </body>
+
+</html>
